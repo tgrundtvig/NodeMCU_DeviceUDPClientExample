@@ -2,8 +2,8 @@
 #include <DeviceUDPClient.h>
 #include <ESP8266WiFi.h>        // Include the Wi-Fi library
 
-const char* ssid     = "SSID";         // The SSID (name) of the Wi-Fi network you want to connect to
-const char* password = "PASSWORD";     // The password of the Wi-Fi network
+const char* ssid     = "CPHBUS";         // The SSID (name) of the Wi-Fi network you want to connect to
+const char* password = "Cphbus2012";     // The password of the Wi-Fi network
 
 //The client will begin by sending a broadcast packet to find the server.
 const uint16_t local_port = 2323; //the local port on the NodeMCU
@@ -11,10 +11,12 @@ const uint16_t server_port = 3377; //The port on the server to connect to.
 
 unsigned long last_send = 0;
 
+unsigned int pID = 0;
+
 DeviceUDPClient client(ESP.getChipId(), "TestDevice", 1);
 
 void setup() {
-  Serial.begin(9600);         // Start the Serial communication to send messages to the computer
+  Serial.begin(115200);         // Start the Serial communication to send messages to the computer
   delay(10);
   Serial.println('\n');
   
@@ -42,9 +44,13 @@ void loop()
   unsigned long cur_time = millis();
   client.update(cur_time);
 
-  if(cur_time - last_send > 10000)
+  if(cur_time - last_send > 200)
   {
-    client.sendPacketToServer(42, 1, 2);
+    uint16 res = client.sendPacketToServer(42, pID, 2, true, false);
+    if(res != 0)
+    {
+      ++pID;
+    }
     last_send = cur_time;
   }
 }
